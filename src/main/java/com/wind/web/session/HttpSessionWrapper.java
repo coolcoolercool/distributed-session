@@ -40,9 +40,9 @@ public class HttpSessionWrapper extends HttpSessionBasic {
     @SuppressWarnings("unchecked")
     private void initSession(HttpContext httpContext) {
         currentSessionId = CookieUtil.getCurrentSessionId(httpContext);
-        //如果 ，就新建一个Session
+        //如果SessionId为空 ，就新建一个Session
         if (StringUtils.isEmpty(currentSessionId)) {
-            currentSessionId = CookieUtil.generateNewSessionId();
+            currentSessionId = CookieUtil.generateNewSessionId(); //利用UUID生成SessioonID
             CookieUtil.writeCookie(currentSessionId, httpContext);
             isNew = true;
         }
@@ -54,14 +54,14 @@ public class HttpSessionWrapper extends HttpSessionBasic {
             LOGGER.info("session is null");
             isNew = true;
             sessionMap = new HashMap<>();
-            sessionMap.put(CREATION_TIME, System.currentTimeMillis());
-            sessionMap.put(LAST_UPDATE_TIME, System.currentTimeMillis());
+            sessionMap.put(CREATION_TIME, System.currentTimeMillis());   //session的创建时间
+            sessionMap.put(LAST_UPDATE_TIME, System.currentTimeMillis()); //session的最后更新时间
         } else { //如果Session不为null
             LOGGER.info("session existed");
             sessionMap = (Map<String, Object>) session;
             long lastUpdateTime = (long) sessionMap.get(LAST_UPDATE_TIME);
-            long period = (System.currentTimeMillis() - lastUpdateTime) / 1000;//计算存活时间，单位秒
-            // 过期
+            long period = (System.currentTimeMillis() - lastUpdateTime) / 1000; //计算存活时间，单位秒
+            // Session过期
             if (period > httpContext.getCookieConfig().getMaxAge()) {
                 LOGGER.info("session expired");
                 invalidate();
@@ -69,10 +69,10 @@ public class HttpSessionWrapper extends HttpSessionBasic {
                 sessionMap.put(LAST_UPDATE_TIME, System.currentTimeMillis());
                 isNew = true;
             } else {
-                //未过期
+                //Session未过期
                 LOGGER.info("update session");
-                sessionMap.put(LAST_UPDATE_TIME, System.currentTimeMillis());
-                redisStorage.replace(currentSessionId, sessionMap, cookieConfig.getMaxAge());
+                sessionMap.put(LAST_UPDATE_TIME, System.currentTimeMillis());  //更新 最后更新时间
+                redisStorage.replace(currentSessionId, sessionMap, cookieConfig.getMaxAge()); //更新 Session在Redis中的储存数据，一共有三组数据
             }
         }
     }
