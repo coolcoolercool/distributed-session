@@ -8,7 +8,7 @@
 - 兼容浏览器禁止cookie的情况，从请求中获取
 
 # 本地运行说明
-应用启动前，需要在本地启动两个redis实例或修改applicationContext.xml中redisSessionManager的redisServer属性值。
+- 应用启动前，需要在本地启动两个redis实例或修改applicationContext.xml中redisSessionManager的redisServer属性值。
 =======
 # distributed-session
 >>>>>>> dc6167169a8cb41c794f734e776a7f4c950fd42e
